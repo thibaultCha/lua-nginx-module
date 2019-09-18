@@ -1599,13 +1599,7 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_lua_module);
     if (ctx == NULL) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "no ngx_lua ctx found while TLS handshaking");
-
-        ngx_http_lua_assert(NULL);
-
-        *errmsg = "no ctx found";
-        return NGX_ERROR;
+        return NGX_HTTP_LUA_FFI_NO_REQ_CTX;
     }
 
     coctx = ctx->cur_co_ctx;
