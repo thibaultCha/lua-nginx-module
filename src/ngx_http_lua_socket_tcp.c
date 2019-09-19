@@ -1708,7 +1708,8 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
 
             if (u->ssl_name.len >= server_name->len) {
                 /* reuse it */
-                ngx_memcpy(u->ssl_name.data, server_name->data, server_name->len);
+                ngx_memcpy(u->ssl_name.data, server_name->data,
+                           server_name->len);
                 u->ssl_name.len = server_name->len;
 
             } else {
