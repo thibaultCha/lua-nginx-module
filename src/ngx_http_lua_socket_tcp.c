@@ -22,7 +22,6 @@
 static int ngx_http_lua_socket_tcp(lua_State *L);
 static int ngx_http_lua_socket_tcp_connect(lua_State *L);
 #if (NGX_HTTP_SSL)
-static int ngx_http_lua_socket_tcp_sslhandshake(lua_State *L);
 static void ngx_http_lua_tls_handshake_handler(ngx_connection_t *c);
 static int ngx_http_lua_tls_handshake_retval_handler(ngx_http_request_t *r,
     ngx_http_lua_socket_tcp_upstream_t *u, lua_State *L);
@@ -213,9 +212,6 @@ static char ngx_http_lua_upstream_udata_metatable_key;
 static char ngx_http_lua_downstream_udata_metatable_key;
 static char ngx_http_lua_pool_udata_metatable_key;
 static char ngx_http_lua_pattern_udata_metatable_key;
-#if (NGX_HTTP_SSL)
-static char ngx_http_lua_ssl_session_metatable_key;
-#endif
 
 
 void
@@ -1535,13 +1531,16 @@ int
 ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
     ngx_http_lua_socket_tcp_upstream_t *u, ngx_ssl_session_t *sess,
     int enable_session_reuse, ngx_str_t *server_name, int verify,
-    int ocsp_status_req, const char **errmsg)
+    int ocsp_status_req, STACK_OF(X509) *chain, EVP_PKEY *pkey,
+    const char **errmsg)
 {
-    ngx_int_t                rc;
+    ngx_int_t                rc, i;
     ngx_connection_t        *c;
     ngx_http_lua_ctx_t      *ctx;
     ngx_http_lua_co_ctx_t   *coctx;
     const char              *busy_rc;
+    ngx_ssl_conn_t          *ssl_conn;
+    X509                    *x509;
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                    "lua tcp socket tls handshake");
@@ -1597,6 +1596,8 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
         return NGX_ERROR;
     }
 
+    ssl_conn = c->ssl->connection;
+
     ctx = ngx_http_get_module_ctx(r, ngx_http_lua_module);
     if (ctx == NULL) {
         return NGX_HTTP_LUA_FFI_NO_REQ_CTX;
@@ -1617,6 +1618,53 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
 
     } else {
         u->ssl_session_reuse = enable_session_reuse;
+    }
+
+    if (chain != NULL) {
+        ngx_http_lua_assert(pkey != NULL); /* ensured by resty.core */
+
+        if (sk_X509_num(chain) < 1) {
+            ERR_clear_error();
+            *errmsg = "invalid client certificate chain";
+            return NGX_ERROR;
+        }
+
+        x509 = sk_X509_value(chain, 0);
+        if (x509 == NULL) {
+            ERR_clear_error();
+            *errmsg = "lua tls fetch client certificate from chain failed";
+            return NGX_ERROR;
+        }
+
+        if (SSL_use_certificate(ssl_conn, x509) == 0) {
+            ERR_clear_error();
+            *errmsg = "lua tls set client certificate failed";
+            return NGX_ERROR;
+        }
+
+        /* read rest of the chain */
+
+        for (i = 1; i < sk_X509_num(chain); i++) {
+            x509 = sk_X509_value(chain, i);
+            if (x509 == NULL) {
+                ERR_clear_error();
+                *errmsg = "lua tls fetch client intermediate certificate "
+                          "from chain failed";
+                return NGX_ERROR;
+            }
+
+            if (SSL_add1_chain_cert(ssl_conn, x509) == 0) {
+                ERR_clear_error();
+                *errmsg = "lua tls set client intermediate certificate failed";
+                return NGX_ERROR;
+            }
+        }
+
+        if (SSL_use_PrivateKey(ssl_conn, pkey) == 0) {
+            ERR_clear_error();
+            *errmsg = "lua ssl set client private key failed";
+            return NGX_ERROR;
+        }
     }
 
     if (server_name != NULL && server_name->data != NULL) {
