@@ -80,7 +80,7 @@ __DATA__
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval: qr/ssl_session_fetch_by_lua_block:.*?,|\bssl session fetch: connection reusable: \d+|\breusable connection: \d+/
@@ -166,7 +166,7 @@ ssl_session_fetch_by_lua_block:1: ssl fetch sess by lua is running!,
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -250,7 +250,7 @@ qr/elapsed in ssl fetch session by lua: 0.(?:09|1[01])\d+,/,
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -351,7 +351,7 @@ qr/my timer run!/s
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -432,7 +432,7 @@ qr/received memc reply: OK/s
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -513,7 +513,7 @@ should never reached here
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -595,7 +595,7 @@ should never reached here
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -676,7 +676,7 @@ should never reached here
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -759,7 +759,7 @@ should never reached here
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -839,7 +839,7 @@ should never reached here
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -925,7 +925,7 @@ qr/get_phase: ssl_session_fetch/s
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -1011,7 +1011,7 @@ print("ssl fetch sess by lua is running!")
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -1095,7 +1095,7 @@ qr/\S+:\d+: ssl fetch sess by lua is running!/s
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 
 --- grep_error_log eval
@@ -1271,7 +1271,7 @@ GET /t
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 --- no_error_log
 [warn]
@@ -1332,7 +1332,7 @@ close: 1 nil
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 --- grep_error_log eval: qr/ssl_session_fetch_by_lua_block:.*?,|\bssl session fetch: connection reusable: \d+|\breusable connection: \d+/
 --- grep_error_log_out eval
@@ -1415,7 +1415,7 @@ ssl_session_fetch_by_lua_block:1: ssl_session_fetch_by_lua\* is running!,
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 --- grep_error_log eval
 qr/elapsed in ssl_session_fetch_by_lua\*: 0\.(?:09|1[01])\d+,/,
@@ -1508,7 +1508,7 @@ qr/elapsed in ssl_session_fetch_by_lua\*: 0\.(?:09|1[01])\d+,/,
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 --- grep_error_log eval: qr/received memc reply of \d+ bytes/
 --- grep_error_log_out eval
@@ -1603,7 +1603,7 @@ close: 1 nil
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 --- grep_error_log eval: qr/uthread: [^.,]+/
 --- grep_error_log_out eval
@@ -1703,7 +1703,7 @@ uthread: failed to kill: already waited or killed
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 close: 1 nil
 --- grep_error_log eval: qr/uthread: [^.,]+/
 --- grep_error_log_out eval
