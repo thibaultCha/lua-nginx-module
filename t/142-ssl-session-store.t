@@ -81,7 +81,7 @@ ssl handshake: cdata
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -156,7 +156,7 @@ ssl handshake: cdata
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 API disabled in the context of ssl_session_store_by_lua*
 
 --- no_error_log
@@ -231,7 +231,7 @@ ssl handshake: cdata
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 my timer run!
 
 --- no_error_log
@@ -323,7 +323,7 @@ ssl handshake: cdata
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 API disabled in the context of ssl_session_store_by_lua*
 
 --- no_error_log
@@ -676,7 +676,7 @@ close: 1 nil
 
 --- error_log eval
 [
-'lua ssl server name: "test.com"',
+'lua tls server name: "test.com"',
 qr/elapsed in ssl cert by lua: 0.(?:09|1[01])\d+,/,
 'ssl_session_store_by_lua_block:1: ssl store session by lua is running!',
 ]
@@ -748,7 +748,7 @@ ssl handshake: cdata
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 a.lua:1: ssl store session by lua is running!
 
 --- no_error_log
@@ -895,7 +895,7 @@ ssl handshake: cdata
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 ssl_session_store_by_lua_block:1: ssl session store by lua is running!
 
 --- no_error_log

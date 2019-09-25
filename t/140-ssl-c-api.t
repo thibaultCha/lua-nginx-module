@@ -224,7 +224,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -378,7 +378,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -506,7 +506,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to parse PEM cert: PEM_read_bio_X509_AUX()
 failed to parse PEM priv key: PEM_read_bio_PrivateKey() failed
 
@@ -657,7 +657,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -807,7 +807,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
