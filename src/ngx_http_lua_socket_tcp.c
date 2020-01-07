@@ -1527,6 +1527,7 @@ ngx_http_lua_socket_tcp_check_busy(ngx_http_request_t *r,
     return NULL;
 }
 
+
 int
 ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
     ngx_http_lua_socket_tcp_upstream_t *u, ngx_ssl_session_t *sess,
@@ -1568,7 +1569,7 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
     }
 
     if (u->raw_downstream || u->body_downstream) {
-        *errmsg = "not supported for downstream";
+        *errmsg = "not supported for downstream sockets";
         return NGX_ERROR;
     }
 
@@ -1609,7 +1610,7 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
 
     if (sess != NULL) {
         if (ngx_ssl_set_session(c, sess) != NGX_OK) {
-            *errmsg = "lua tls set session failed";
+            *errmsg = "tls set session failed";
             return NGX_ERROR;
         }
 
@@ -1632,13 +1633,13 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
         x509 = sk_X509_value(chain, 0);
         if (x509 == NULL) {
             ERR_clear_error();
-            *errmsg = "lua tls fetch client certificate from chain failed";
+            *errmsg = "tls fetch client certificate from chain failed";
             return NGX_ERROR;
         }
 
         if (SSL_use_certificate(ssl_conn, x509) == 0) {
             ERR_clear_error();
-            *errmsg = "lua tls set client certificate failed";
+            *errmsg = "tls set client certificate failed";
             return NGX_ERROR;
         }
 
@@ -1648,21 +1649,21 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
             x509 = sk_X509_value(chain, i);
             if (x509 == NULL) {
                 ERR_clear_error();
-                *errmsg = "lua tls fetch client intermediate certificate "
-                          "from chain failed";
+                *errmsg = "tls fetch client intermediate certificate from "
+                          "chain failed";
                 return NGX_ERROR;
             }
 
             if (SSL_add1_chain_cert(ssl_conn, x509) == 0) {
                 ERR_clear_error();
-                *errmsg = "lua tls set client intermediate certificate failed";
+                *errmsg = "tls set client intermediate certificate failed";
                 return NGX_ERROR;
             }
         }
 
         if (SSL_use_PrivateKey(ssl_conn, pkey) == 0) {
             ERR_clear_error();
-            *errmsg = "lua ssl set client private key failed";
+            *errmsg = "tls set client private key failed";
             return NGX_ERROR;
         }
     }
@@ -1681,7 +1682,7 @@ ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
         }
 
 #else
-        *errmsg = "OpenSSL has no SNI support";
+        *errmsg = "no TLS extension support";
         return NGX_ERROR;
 #endif
     }
@@ -1724,7 +1725,6 @@ new_ssl_name:
             u->ssl_name.data = ngx_alloc(server_name->len, ngx_cycle->log);
             if (u->ssl_name.data == NULL) {
                 u->ssl_name.len = 0;
-
                 *errmsg = "no memory";
                 return NGX_ERROR;
             }
@@ -1745,7 +1745,7 @@ new_ssl_name:
     rc = ngx_ssl_handshake(c);
 
     ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "ngx_ssl_handshake returned %d", rc);
+                   "ngx_ssl_handshake returned: %d", rc);
 
     if (rc == NGX_AGAIN) {
         if (c->write->timer_set) {
@@ -1777,7 +1777,6 @@ new_ssl_name:
 
     if (rc == NGX_ERROR) {
         *errmsg = u->error_ret;
-
         return NGX_ERROR;
     }
 
@@ -1889,7 +1888,6 @@ failed:
         (void) ngx_http_lua_socket_conn_error_retval_handler(r, u, NULL);
     }
 }
-
 
 
 int
