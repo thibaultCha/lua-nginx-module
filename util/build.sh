@@ -22,7 +22,7 @@ force=$2
             #--without-http_referer_module \
             #--with-http_spdy_module \
 
-add_fake_shm_module="--add-module=$root/t/data/fake-shm-module"
+#add_fake_shm_module="--add-module=$root/t/data/fake-shm-module"
 
 time ngx-build $force $version \
             --with-pcre-jit \
@@ -33,6 +33,7 @@ time ngx-build $force $version \
             --with-http_ssl_module \
             --add-module=$root/../ndk-nginx-module \
             --add-module=$root/../set-misc-nginx-module \
+            --add-module=$root/../meta-lua-nginx-module/src/meta \
             --with-ld-opt="-L$PCRE_LIB -L$OPENSSL_LIB -Wl,-rpath,$PCRE_LIB:$LIBDRIZZLE_LIB:$OPENSSL_LIB" \
             --without-mail_pop3_module \
             --without-mail_imap_module \

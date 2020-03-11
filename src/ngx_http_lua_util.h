@@ -322,7 +322,9 @@ ngx_http_lua_create_ctx(ngx_http_request_t *r)
         ngx_http_lua_assert(L != NULL);
 
         if (lmcf->init_handler) {
-            if (lmcf->init_handler(r->connection->log, lmcf, L) != NGX_OK) {
+            if (lmcf->init_handler(r->connection->log, lmcf->init_src, L)
+                != NGX_OK)
+            {
                 /* an error happened */
                 return NULL;
             }

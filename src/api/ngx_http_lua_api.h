@@ -48,14 +48,6 @@ ngx_http_request_t *ngx_http_lua_get_request(lua_State *L);
 ngx_int_t ngx_http_lua_add_package_preload(ngx_conf_t *cf, const char *package,
     lua_CFunction func);
 
-ngx_int_t ngx_http_lua_shared_dict_get(ngx_shm_zone_t *shm_zone,
-    u_char *key_data, size_t key_len, ngx_http_lua_value_t *value);
-
-ngx_shm_zone_t *ngx_http_lua_find_zone(u_char *name_data, size_t name_len);
-
-ngx_shm_zone_t *ngx_http_lua_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name,
-    size_t size, void *tag);
-
 
 #endif /* _NGX_HTTP_LUA_API_H_INCLUDED_ */
 

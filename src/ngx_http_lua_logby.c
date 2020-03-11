@@ -21,7 +21,6 @@
 #include "ngx_http_lua_string.h"
 #include "ngx_http_lua_misc.h"
 #include "ngx_http_lua_consts.h"
-#include "ngx_http_lua_shdict.h"
 #include "ngx_http_lua_util.h"
 #include "ngx_http_lua_exception.h"
 #if (NGX_HTTP_LUA_HAVE_MALLOC_TRIM)

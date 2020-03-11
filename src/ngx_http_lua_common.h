@@ -22,6 +22,9 @@
 #include <lauxlib.h>
 
 
+#include "ngx_meta_lua_api.h"
+
+
 #if defined(NDK) && NDK
 #include <ndk.h>
 
@@ -54,6 +57,10 @@ typedef struct {
 
 #if (nginx_version < 1006000)
 #   error at least nginx 1.6.0 is required but found an older version
+#endif
+
+#if !defined(ngx_meta_lua_version) || ngx_meta_lua_version < 00001
+#   error ngx_meta_lua_module 0.0.1 or above is required
 #endif
 
 #if LUA_VERSION_NUM != 501
@@ -157,8 +164,8 @@ typedef struct ngx_http_lua_posted_thread_s  ngx_http_lua_posted_thread_t;
 typedef struct ngx_http_lua_balancer_peer_data_s
     ngx_http_lua_balancer_peer_data_t;
 
-typedef ngx_int_t (*ngx_http_lua_main_conf_handler_pt)(ngx_log_t *log,
-    ngx_http_lua_main_conf_t *lmcf, lua_State *L);
+//typedef ngx_int_t (*ngx_http_lua_main_conf_handler_pt)(ngx_log_t *log,
+//    ngx_http_lua_main_conf_t *lmcf, lua_State *L);
 
 typedef ngx_int_t (*ngx_http_lua_srv_conf_handler_pt)(ngx_http_request_t *r,
     ngx_http_lua_srv_conf_t *lscf, lua_State *L);
@@ -200,19 +207,15 @@ struct ngx_http_lua_main_conf_s {
 #   endif
 #endif
 
-    ngx_array_t         *shm_zones;  /* of ngx_shm_zone_t* */
-
-    ngx_array_t         *shdict_zones; /* shm zones of "shdict" */
-
     ngx_array_t         *preload_hooks; /* of ngx_http_lua_preload_hook_t */
 
     ngx_flag_t           postponed_to_rewrite_phase_end;
     ngx_flag_t           postponed_to_access_phase_end;
 
-    ngx_http_lua_main_conf_handler_pt    init_handler;
+    ngx_meta_lua_main_conf_handler_pt    init_handler;
     ngx_str_t                            init_src;
 
-    ngx_http_lua_main_conf_handler_pt    init_worker_handler;
+    ngx_meta_lua_main_conf_handler_pt    init_worker_handler;
     ngx_str_t                            init_worker_src;
 
     ngx_http_lua_balancer_peer_data_t      *balancer_peer_data;
@@ -243,8 +246,6 @@ struct ngx_http_lua_main_conf_s {
                      * main conf.
                      */
 
-    ngx_uint_t                      shm_zones_inited;
-
     ngx_http_lua_sema_mm_t         *sema_mm;
 
     ngx_uint_t           malloc_trim_cycle;  /* a cycle is defined as the number
@@ -267,7 +268,6 @@ struct ngx_http_lua_main_conf_s {
     unsigned             requires_rewrite:1;
     unsigned             requires_access:1;
     unsigned             requires_log:1;
-    unsigned             requires_shm:1;
     unsigned             requires_capture_log:1;
 };
 

@@ -12,6 +12,7 @@
 
 
 #include "nginx.h"
+#include "ngx_meta_lua_api.h"
 #include "ngx_http_lua_directive.h"
 #include "ngx_http_lua_util.h"
 #include "ngx_http_lua_exception.h"
@@ -28,7 +29,6 @@
 #include "ngx_http_lua_string.h"
 #include "ngx_http_lua_misc.h"
 #include "ngx_http_lua_consts.h"
-#include "ngx_http_lua_shdict.h"
 #include "ngx_http_lua_coroutine.h"
 #include "ngx_http_lua_socket_tcp.h"
 #include "ngx_http_lua_socket_udp.h"
@@ -113,7 +113,7 @@ static ngx_int_t ngx_http_lua_handle_rewrite_jump(lua_State *L,
     ngx_http_request_t *r, ngx_http_lua_ctx_t *ctx);
 static int ngx_http_lua_thread_traceback(lua_State *L, lua_State *co,
     ngx_http_lua_co_ctx_t *coctx);
-static void ngx_http_lua_inject_ngx_api(lua_State *L,
+static void ngx_http_lua_inject_ngx_api(lua_State *L, ngx_cycle_t *cycle,
     ngx_http_lua_main_conf_t *lmcf, ngx_log_t *log);
 static void ngx_http_lua_inject_arg_api(lua_State *L);
 static int ngx_http_lua_param_get(lua_State *L);
@@ -711,13 +711,13 @@ ngx_http_lua_init_globals(lua_State *L, ngx_cycle_t *cycle,
     ngx_http_lua_inject_ndk_api(L);
 #endif /* defined(NDK) && NDK */
 
-    ngx_http_lua_inject_ngx_api(L, lmcf, log);
+    ngx_http_lua_inject_ngx_api(L, cycle, lmcf, log);
 }
 
 
 static void
-ngx_http_lua_inject_ngx_api(lua_State *L, ngx_http_lua_main_conf_t *lmcf,
-    ngx_log_t *log)
+ngx_http_lua_inject_ngx_api(lua_State *L, ngx_cycle_t *cycle,
+    ngx_http_lua_main_conf_t *lmcf, ngx_log_t *log)
 {
     lua_createtable(L, 0 /* narr */, 113 /* nrec */);    /* ngx.* */
 
@@ -739,7 +739,7 @@ ngx_http_lua_inject_ngx_api(lua_State *L, ngx_http_lua_main_conf_t *lmcf,
     ngx_http_lua_inject_req_api(log, L);
     ngx_http_lua_inject_resp_header_api(L);
     ngx_http_lua_create_headers_metatable(log, L);
-    ngx_http_lua_inject_shdict_api(lmcf, L);
+    ngx_meta_lua_inject_shdict_api(L, cycle, &ngx_http_lua_module);
     ngx_http_lua_inject_socket_tcp_api(log, L);
     ngx_http_lua_inject_socket_udp_api(log, L);
     ngx_http_lua_inject_uthread_api(log, L);

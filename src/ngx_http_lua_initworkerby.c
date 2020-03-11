@@ -292,7 +292,8 @@ ngx_http_lua_init_worker(ngx_cycle_t *cycle)
 
     ngx_http_lua_set_req(lmcf->lua, r);
 
-    (void) lmcf->init_worker_handler(cycle->log, lmcf, lmcf->lua);
+    (void) lmcf->init_worker_handler(cycle->log, lmcf->init_worker_src,
+                                     lmcf->lua);
 
     ngx_destroy_pool(c->pool);
     return NGX_OK;
@@ -312,13 +313,13 @@ failed:
 
 
 ngx_int_t
-ngx_http_lua_init_worker_by_inline(ngx_log_t *log,
-    ngx_http_lua_main_conf_t *lmcf, lua_State *L)
+ngx_http_lua_init_worker_by_inline(ngx_log_t *log, ngx_str_t init_worker_src,
+    lua_State *L)
 {
     int         status;
 
-    status = luaL_loadbuffer(L, (char *) lmcf->init_worker_src.data,
-                             lmcf->init_worker_src.len, "=init_worker_by_lua")
+    status = luaL_loadbuffer(L, (char *) init_worker_src.data,
+                             init_worker_src.len, "=init_worker_by_lua")
              || ngx_http_lua_do_call(log, L);
 
     return ngx_http_lua_report(log, L, status, "init_worker_by_lua");
@@ -326,12 +327,12 @@ ngx_http_lua_init_worker_by_inline(ngx_log_t *log,
 
 
 ngx_int_t
-ngx_http_lua_init_worker_by_file(ngx_log_t *log, ngx_http_lua_main_conf_t *lmcf,
+ngx_http_lua_init_worker_by_file(ngx_log_t *log, ngx_str_t init_worker_src,
     lua_State *L)
 {
     int         status;
 
-    status = luaL_loadfile(L, (char *) lmcf->init_worker_src.data)
+    status = luaL_loadfile(L, (char *) init_worker_src.data)
              || ngx_http_lua_do_call(log, L);
 
     return ngx_http_lua_report(log, L, status, "init_worker_by_lua_file");

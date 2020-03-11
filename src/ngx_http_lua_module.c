@@ -11,6 +11,7 @@
 #include "ddebug.h"
 
 
+#include "ngx_meta_lua_api.h"
 #include "ngx_http_lua_directive.h"
 #include "ngx_http_lua_capturefilter.h"
 #include "ngx_http_lua_contentby.h"
@@ -100,7 +101,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
 
     { ngx_string("lua_shared_dict"),
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE2,
-      ngx_http_lua_shared_dict,
+      ngx_http_lua_shdict_directive,
       0,
       0,
       NULL },
@@ -649,7 +650,6 @@ ngx_http_lua_init(ngx_conf_t *cf)
     ngx_int_t                   rc;
     ngx_array_t                *arr;
     ngx_http_handler_pt        *h;
-    volatile ngx_cycle_t       *saved_cycle;
     ngx_http_core_main_conf_t  *cmcf;
     ngx_http_lua_main_conf_t   *lmcf;
     ngx_pool_cleanup_t         *cln;
@@ -811,18 +811,11 @@ ngx_http_lua_init(ngx_conf_t *cf)
 
         ngx_http_lua_assert(lmcf->lua != NULL);
 
-        if (!lmcf->requires_shm && lmcf->init_handler) {
-            saved_cycle = ngx_cycle;
-            ngx_cycle = cf->cycle;
-
-            rc = lmcf->init_handler(cf->log, lmcf, lmcf->lua);
-
-            ngx_cycle = saved_cycle;
-
-            if (rc != NGX_OK) {
-                /* an error happened */
-                return NGX_ERROR;
-            }
+        if (ngx_meta_lua_post_init_handler(cf, lmcf->init_handler,
+                                           lmcf->init_src, lmcf->lua)
+            != NGX_OK)
+        {
+            return NGX_ERROR;
         }
 
         dd("Lua VM initialized!");
@@ -882,11 +875,8 @@ ngx_http_lua_create_main_conf(ngx_conf_t *cf)
      *      lmcf->watcher = NULL;
      *      lmcf->regex_cache_entries = 0;
      *      lmcf->jit_stack = NULL;
-     *      lmcf->shm_zones = NULL;
      *      lmcf->init_handler = NULL;
      *      lmcf->init_src = { 0, NULL };
-     *      lmcf->shm_zones_inited = 0;
-     *      lmcf->shdict_zones = NULL;
      *      lmcf->preload_hooks = NULL;
      *      lmcf->requires_header_filter = 0;
      *      lmcf->requires_body_filter = 0;
@@ -894,7 +884,6 @@ ngx_http_lua_create_main_conf(ngx_conf_t *cf)
      *      lmcf->requires_rewrite = 0;
      *      lmcf->requires_access = 0;
      *      lmcf->requires_log = 0;
-     *      lmcf->requires_shm = 0;
      */
 
     lmcf->pool = cf->pool;
