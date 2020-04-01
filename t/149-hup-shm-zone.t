@@ -15,32 +15,23 @@ BEGIN {
 use lib 'lib';
 use Test::Nginx::Socket::Lua $SkipReason ? (skip_all => $SkipReason) : ();
 
-#worker_connections(1014);
-#master_process_enabled(1);
-#log_level('warn');
-
 repeat_each(2);
 
 plan tests => repeat_each() * (blocks() * 3);
 
-#no_diff();
 no_long_string();
-#master_on();
-#workers(2);
-
 no_shuffle();
-
 run_tests();
 
 __DATA__
 
 === TEST 1: get_info, before HUP reload
 --- http_config
-    lua_fake_shm x1 1m;
+    lua_shared_dict x1 1m;
 --- config
     location = /test {
         content_by_lua_block {
-            local shm_zones = require("fake_shm_zones")
+            local shm_zones = ngx.shared
             local name, size, isinit, isold
             local x1 = shm_zones.x1
 
@@ -65,11 +56,11 @@ isold=false
 
 === TEST 2: get_info, after HUP reload
 --- http_config
-    lua_fake_shm x1 1m;
+    lua_shared_dict x1 1m;
 --- config
     location = /test {
         content_by_lua_block {
-            local shm_zones = require("fake_shm_zones")
+            local shm_zones = ngx.shared
             local name, size, isinit, isold
             local x1 = shm_zones.x1
 
